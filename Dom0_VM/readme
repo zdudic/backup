@@ -1,0 +1,65 @@
+Backup a VM in standalone Dom0 (OVS Oracle Virtual Server)
+
+Intro
+------
+
+The script backup_dom0_vm.sh can be used for this purpose. 
+It takes snapshot of a VM's disk boot image (no other disks at this moment), then backs up that snapshot to some other location.
+The script takes three mandatory arguments: a VM name, image retention in counts and backup path.
+
+Requirement is that a VM disk image is file Dom0:/OVS/${vm}/${vm}.img
+The /OVS is ocsf2 and its tool reflink is used to take a snapshot of disk image.
+
+This tool can be run manually or as cron job.
+
+Usage
+------
+Usage: backup_dom0_vm.sh   
+ 
+Conditions:
+VM disk image must be Dom0:/OVS/<VM>/<VM>.img
+VM cfg must be Dom0:/OVS/<VM>/<VM>.cfg
+
+
+Example:
+
+# crontab -l
+# backup ldap02
+#Usage: backup_dom0_vm.sh   
+25 02 * * * backup_dom0_vm.sh ldap02 5 /import/vm-backup/Dom0/
+
+Logs
+-----
+
+The script logs are in /var/log/backup_dom0_vm.sh/
+
+Example of log file 20191004-1425.log is:
+
+=======================================================
+Getting snapshot (using reflink) of /OVS/ldap02/ldap02.img
+Snapshot is /OVS/ldap02/ldap02.img-SNAPSHOT-20191004-1425
+
+Backup snapshot /OVS/ldap02/ldap02.img-SNAPSHOT-20191004-1425
+Backup is /import/vm-backup/Dom0/ldap02.img-FULLBACKUP-20191004-1425
+ldap02.img-SNAPSHOT-20191004-1425
+      26.84G 100%   54.22MB/s    0:07:52 (xfer#1, to-check=0/1)
+
+Number of files: 1
+Number of files transferred: 1
+Total file size: 26.84G bytes
+Total transferred file size: 26.84G bytes
+Literal data: 26.84G bytes
+Matched data: 0 bytes
+File list size: 52
+File list generation time: 0.001 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 26.85G
+Total bytes received: 31
+
+sent 26.85G bytes  received 31 bytes  56.70M bytes/sec
+total size is 26.84G  speedup is 1.00
+
+Removing snapshot /OVS/ldap02/ldap02.img-SNAPSHOT-20191004-1425
+
+There is no older backup to be removed
+=========================================================
